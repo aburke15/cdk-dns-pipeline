@@ -8,8 +8,8 @@ export class CdkDnsPipelineStage extends Stage {
 
     const dnsDefinitionStack = new CdkDnsDefinitionStack(this, 'CdkDnsDefinitionStack', {
       env: {
-        account: props?.env?.account,
-        region: props?.env?.region,
+        account: process.env.CDK_DEFAULT_ACCOUNT,
+        region: process.env.CDK_DEFAULT_REGION,
       },
     });
   }
