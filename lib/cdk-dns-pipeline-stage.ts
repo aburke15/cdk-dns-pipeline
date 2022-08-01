@@ -6,7 +6,6 @@ export class CdkDnsPipelineStage extends Stage {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    // TODO: just temporary
     const dnsDefinitionStack = new CdkDnsDefinitionStack(this, 'CdkDnsDefinitionStack', {
       env: {
         account: props?.env?.account,
