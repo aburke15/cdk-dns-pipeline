@@ -14,5 +14,7 @@ export class CdkDnsPipelineStack extends Stack {
         commands: ['npm-ci', 'npm run build', 'npx cdk synth'],
       }),
     });
+
+    dnsPipeline.addStage(new CdkDnsPipelineStage(this, 'CdkDnsPipelineStage'));
   }
 }
