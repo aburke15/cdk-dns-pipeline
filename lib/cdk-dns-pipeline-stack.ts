@@ -16,5 +16,7 @@ export class CdkDnsPipelineStack extends Stack {
     });
 
     dnsPipeline.addStage(new CdkDnsPipelineStage(this, 'CdkDnsPipelineStage'));
+
+    dnsPipeline.buildPipeline();
   }
 }
