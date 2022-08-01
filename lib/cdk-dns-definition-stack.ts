@@ -8,12 +8,12 @@ export class CdkDnsDefinitionStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const certificate = new Certificate(this, 'Certificate', {
+    const certificate = new Certificate(this, 'DnsCertificate', {
       domainName: '*.aburke.tech',
       validation: CertificateValidation.fromEmail(),
     });
 
-    const zone = new PublicHostedZone(this, 'HostedZone', {
+    const zone = new PublicHostedZone(this, 'DnsHostedZone', {
       zoneName: 'aburke.tech',
     });
 
