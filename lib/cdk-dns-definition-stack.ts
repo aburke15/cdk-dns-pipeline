@@ -23,14 +23,14 @@ export class CdkDnsDefinitionStack extends Stack {
     //   zone: zone,
     // });
 
-    const zoneArnSecret = new Secret(this, '', {
+    const zoneArnSecret = new Secret(this, 'AburkeTechZoneArnSecret', {
       secretName: 'AburkeTechZoneArn',
       generateSecretString: {
         generateStringKey: zone.hostedZoneArn,
       },
     });
 
-    const certArnSecret = new Secret(this, '', {
+    const certArnSecret = new Secret(this, 'AburkeTechCertArnSecret', {
       secretName: 'AburkeTechCertArn',
       generateSecretString: {
         generateStringKey: certificate.certificateArn,
