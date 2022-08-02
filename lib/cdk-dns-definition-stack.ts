@@ -8,20 +8,22 @@ export class CdkDnsDefinitionStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
+    const domainName: string = 'aburke.tech';
+
     const certificate = new Certificate(this, 'DnsCertificate', {
-      domainName: '*.aburke.tech',
+      domainName: `*.${domainName}`,
       validation: CertificateValidation.fromEmail(),
     });
 
     const zone = new PublicHostedZone(this, 'DnsHostedZone', {
-      zoneName: 'aburke.tech',
+      zoneName: domainName,
     });
 
-    // new CnameRecord(this, 'AburkeTechCnameRecord', {
-    //   domainName: 'aburke.tech',
-    //   recordName: 'www',
-    //   zone: zone,
-    // });
+    new CnameRecord(this, 'AburkeTechCnameRecord', {
+      recordName: 'www',
+      domainName: 'cname.vercel-dns.com',
+      zone: zone,
+    });
 
     // const zoneArnSecret = new Secret(this, 'AburkeTechZoneArnSecret', {
     //   secretName: 'AburkeTechZoneArn',
