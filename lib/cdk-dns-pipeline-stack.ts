@@ -11,7 +11,7 @@ export class CdkDnsPipelineStack extends Stack {
       pipelineName: 'CdkDnsPipeline',
       synth: new ShellStep('Synth', {
         input: CodePipelineSource.gitHub('aburke15/cdk-dns-pipeline', 'main'),
-        commands: ['npm-ci', 'npm run build', 'npx cdk synth'],
+        commands: ['npm ci', 'npm run build', 'npx cdk synth'],
       }),
     });
 
