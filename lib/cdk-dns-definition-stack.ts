@@ -1,7 +1,8 @@
 import { SecretValue, Stack, StackProps } from 'aws-cdk-lib';
-import { LambdaRestApi, RestApiBase } from 'aws-cdk-lib/aws-apigateway';
+import { IRestApi, LambdaRestApi, RestApiBase } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { ARecord, CnameRecord, PublicHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
+import { HttpsRedirect } from 'aws-cdk-lib/aws-route53-patterns';
 import { ApiGateway } from 'aws-cdk-lib/aws-route53-targets';
 import { ISecret, Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
@@ -38,7 +39,7 @@ export class CdkDnsDefinitionStack extends Stack {
       this,
       'GitHubRepoReadApi',
       apiSecret?.secretValue?.unsafeUnwrap()?.toString()
-    ) as RestApiBase;
+    ) as LambdaRestApi;
 
     api.addDomainName('GitHubRepoApiDomain', {
       domainName: 'proj.aburke.tech',
@@ -48,6 +49,13 @@ export class CdkDnsDefinitionStack extends Stack {
     new ARecord(this, 'AburkeTechAliasARecrod', {
       recordName: 'proj',
       target: RecordTarget.fromAlias(new ApiGateway(api)),
+      zone: zone,
+    });
+
+    new HttpsRedirect(this, 'AburkeTechRedirect', {
+      recordNames: [domainName, `http://${domainName}`],
+      targetDomain: `www.${domainName}`,
+      certificate: certificate,
       zone: zone,
     });
   }
