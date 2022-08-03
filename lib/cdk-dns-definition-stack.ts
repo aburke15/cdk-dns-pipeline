@@ -1,4 +1,4 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { SecretValue, Stack, StackProps } from 'aws-cdk-lib';
 import * as apigw from 'aws-cdk-lib/aws-apigateway';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { ARecord, CnameRecord, PublicHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
@@ -17,6 +17,11 @@ export class CdkDnsDefinitionStack extends Stack {
       validation: CertificateValidation.fromEmail(),
     });
 
+    new Secret(this, 'AburkeTechCertArnSecret', {
+      secretName: 'AburkeTechCertArn',
+      secretStringValue: new SecretValue(certificate.certificateArn),
+    });
+
     const zone = new PublicHostedZone(this, 'DnsHostedZone', {
       zoneName: domainName,
     });
@@ -32,12 +37,5 @@ export class CdkDnsDefinitionStack extends Stack {
     //   target: RecordTarget.fromAlias(new ApiGateway()),
     //   zone: zone,
     // });
-
-    new Secret(this, 'AburkeTechCertArnSecret', {
-      secretName: 'AburkeTechCertArn',
-      generateSecretString: {
-        secretStringTemplate: certificate.certificateArn,
-      },
-    });
   }
 }
