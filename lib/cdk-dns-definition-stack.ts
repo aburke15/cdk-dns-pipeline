@@ -1,9 +1,8 @@
 import { SecretValue, Stack, StackProps } from 'aws-cdk-lib';
-import * as apigw from 'aws-cdk-lib/aws-apigateway';
-import { IRestApi, LambdaRestApi, RestApi, RestApiBase } from 'aws-cdk-lib/aws-apigateway';
+import { LambdaRestApi, RestApiBase } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { ARecord, CnameRecord, PublicHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
-import { ApiGateway } from 'aws-cdk-lib/aws-route53-targets/lib';
+import { ApiGateway } from 'aws-cdk-lib/aws-route53-targets';
 import { ISecret, Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
 
