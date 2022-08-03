@@ -20,11 +20,6 @@ export class CdkDnsDefinitionStack extends Stack {
       validation: CertificateValidation.fromEmail(),
     });
 
-    new Secret(this, 'AburkeTechCertArnSecret', {
-      secretName: 'AburkeTechCertArn',
-      secretStringValue: new SecretValue(certificate.certificateArn),
-    });
-
     const zone = new PublicHostedZone(this, 'DnsHostedZone', {
       zoneName: domainName,
     });
@@ -54,10 +49,10 @@ export class CdkDnsDefinitionStack extends Stack {
       zone: zone,
     });
 
-    new HttpsRedirect(this, 'AburkeTechRedirect', {
-      recordNames: [domainName, `http://${domainName}`],
-      targetDomain: `${wwwPrefix}.${domainName}`,
-      zone: zone,
-    });
+    // new HttpsRedirect(this, 'AburkeTechRedirect', {
+    //   recordNames: [domainName, `http://${domainName}`],
+    //   targetDomain: `${wwwPrefix}.${domainName}`,
+    //   zone: zone,
+    // });
   }
 }
