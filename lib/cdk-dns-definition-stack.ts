@@ -1,6 +1,8 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
+import * as apigw from 'aws-cdk-lib/aws-apigateway';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
-import { CnameRecord, PublicHostedZone } from 'aws-cdk-lib/aws-route53';
+import { ARecord, CnameRecord, PublicHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
+import { ApiGateway } from 'aws-cdk-lib/aws-route53-targets/lib';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
 
@@ -25,18 +27,17 @@ export class CdkDnsDefinitionStack extends Stack {
       zone: zone,
     });
 
-    // const zoneArnSecret = new Secret(this, 'AburkeTechZoneArnSecret', {
-    //   secretName: 'AburkeTechZoneArn',
-    //   generateSecretString: {
-    //     generateStringKey: zone.hostedZoneArn,
-    //   },
+    // new ARecord(this, 'AburkeTechAliasARecrod', {
+    //   recordName: 'proj',
+    //   target: RecordTarget.fromAlias(new ApiGateway()),
+    //   zone: zone,
     // });
 
-    // const certArnSecret = new Secret(this, 'AburkeTechCertArnSecret', {
-    //   secretName: 'AburkeTechCertArn',
-    //   generateSecretString: {
-    //     generateStringKey: certificate.certificateArn,
-    //   },
-    // });
+    new Secret(this, 'AburkeTechCertArnSecret', {
+      secretName: 'AburkeTechCertArn',
+      generateSecretString: {
+        secretStringTemplate: certificate.certificateArn,
+      },
+    });
   }
 }
