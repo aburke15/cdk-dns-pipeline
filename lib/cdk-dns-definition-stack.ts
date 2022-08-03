@@ -40,6 +40,11 @@ export class CdkDnsDefinitionStack extends Stack {
       apiSecret?.secretValue?.unsafeUnwrap()?.toString()
     ) as RestApiBase;
 
+    api.addDomainName('GitHubRepoApiDomain', {
+      domainName: 'proj.aburke.tech',
+      certificate: certificate,
+    });
+
     new ARecord(this, 'AburkeTechAliasARecrod', {
       recordName: 'proj',
       target: RecordTarget.fromAlias(new ApiGateway(api)),
