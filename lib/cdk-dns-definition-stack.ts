@@ -1,5 +1,5 @@
 import { SecretValue, Stack, StackProps } from 'aws-cdk-lib';
-import { IRestApi, LambdaRestApi, RestApiBase } from 'aws-cdk-lib/aws-apigateway';
+import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { ARecord, CnameRecord, PublicHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { HttpsRedirect } from 'aws-cdk-lib/aws-route53-patterns';
@@ -12,6 +12,8 @@ export class CdkDnsDefinitionStack extends Stack {
     super(scope, id, props);
 
     const domainName: string = 'aburke.tech';
+    const wwwPrefix: string = 'www';
+    const projPrefix: string = 'proj';
 
     const certificate = new Certificate(this, 'DnsCertificate', {
       domainName: `*.${domainName}`,
@@ -28,7 +30,7 @@ export class CdkDnsDefinitionStack extends Stack {
     });
 
     new CnameRecord(this, 'AburkeTechCnameRecord', {
-      recordName: 'www',
+      recordName: wwwPrefix,
       domainName: 'cname.vercel-dns.com',
       zone: zone,
     });
@@ -42,20 +44,19 @@ export class CdkDnsDefinitionStack extends Stack {
     ) as LambdaRestApi;
 
     api.addDomainName('GitHubRepoApiDomain', {
-      domainName: 'proj.aburke.tech',
+      domainName: `${projPrefix}.${domainName}`,
       certificate: certificate,
     });
 
     new ARecord(this, 'AburkeTechAliasARecrod', {
-      recordName: 'proj',
+      recordName: projPrefix,
       target: RecordTarget.fromAlias(new ApiGateway(api)),
       zone: zone,
     });
 
     new HttpsRedirect(this, 'AburkeTechRedirect', {
       recordNames: [domainName, `http://${domainName}`],
-      targetDomain: `www.${domainName}`,
-      certificate: certificate,
+      targetDomain: `${wwwPrefix}.${domainName}`,
       zone: zone,
     });
   }
