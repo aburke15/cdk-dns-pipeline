@@ -6,6 +6,6 @@ export class CdkDnsPipelineStage extends Stage {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const dnsDefinitionStack = new CdkDnsDefinitionStack(this, 'CdkDnsDefinitionStack');
+    new CdkDnsDefinitionStack(this, 'CdkDnsDefinitionStack');
   }
 }
