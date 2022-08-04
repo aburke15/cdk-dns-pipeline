@@ -8,24 +8,24 @@ import { ISecret, Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
 
 export class CdkDnsDefinitionStack extends Stack {
+  private readonly domainName: string = 'aburke.tech';
+  private readonly www: string = 'www';
+  private readonly proj: string = 'proj';
+
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const domainName: string = 'aburke.tech';
-    const wwwPrefix: string = 'www';
-    const projPrefix: string = 'proj';
-
     const certificate = new Certificate(this, 'DnsCertificate', {
-      domainName: `*.${domainName}`,
+      domainName: `*.${this.domainName}`,
       validation: CertificateValidation.fromEmail(),
     });
 
     const zone = new PublicHostedZone(this, 'DnsHostedZone', {
-      zoneName: domainName,
+      zoneName: this.domainName,
     });
 
     new CnameRecord(this, 'AburkeTechCnameRecord', {
-      recordName: wwwPrefix,
+      recordName: this.www,
       domainName: 'cname.vercel-dns.com',
       zone: zone,
     });
@@ -39,19 +39,19 @@ export class CdkDnsDefinitionStack extends Stack {
     ) as LambdaRestApi;
 
     api.addDomainName('GitHubRepoApiDomain', {
-      domainName: `${projPrefix}.${domainName}`,
+      domainName: `${this.proj}.${this.domainName}`,
       certificate: certificate,
     });
 
     new ARecord(this, 'AburkeTechAliasARecrod', {
-      recordName: projPrefix,
+      recordName: this.proj,
       target: RecordTarget.fromAlias(new ApiGateway(api)),
       zone: zone,
     });
 
     new HttpsRedirect(this, 'AburkeTechRedirect', {
-      recordNames: [domainName, `http://${domainName}`, `https://${domainName}}`],
-      targetDomain: `${wwwPrefix}.${domainName}`,
+      recordNames: [this.domainName],
+      targetDomain: `${this.www}.${this.domainName}`,
       zone: zone,
     });
   }
