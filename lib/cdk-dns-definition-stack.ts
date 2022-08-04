@@ -1,4 +1,4 @@
-import { SecretValue, Stack, StackProps } from 'aws-cdk-lib';
+import { Stack, StackProps } from 'aws-cdk-lib';
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { ARecord, CnameRecord, PublicHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
@@ -49,10 +49,10 @@ export class CdkDnsDefinitionStack extends Stack {
       zone: zone,
     });
 
-    // new HttpsRedirect(this, 'AburkeTechRedirect', {
-    //   recordNames: [domainName, `http://${domainName}`],
-    //   targetDomain: `${wwwPrefix}.${domainName}`,
-    //   zone: zone,
-    // });
+    new HttpsRedirect(this, 'AburkeTechRedirect', {
+      recordNames: [domainName, `http://${domainName}`, `https://${domainName}}`],
+      targetDomain: `${wwwPrefix}.${domainName}`,
+      zone: zone,
+    });
   }
 }
