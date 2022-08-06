@@ -11,47 +11,54 @@ export class CdkDnsDefinitionStack extends Stack {
   private readonly domainName: string = 'aburke.tech';
   private readonly www: string = 'www';
   private readonly proj: string = 'proj';
+  private readonly res: string = 'res';
+  private readonly aburkeTech: string = 'AburkeTech';
+  private readonly gitHubRepo: string = 'GitHubRepo';
 
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const certificate = new Certificate(this, 'DnsCertificate', {
+    const certificate = new Certificate(this, `${this.aburkeTech}Certificate`, {
       domainName: `*.${this.domainName}`,
       validation: CertificateValidation.fromEmail(),
     });
 
-    const zone = new PublicHostedZone(this, 'DnsHostedZone', {
+    const zone = new PublicHostedZone(this, `${this.aburkeTech}PublicHostedZone`, {
       zoneName: this.domainName,
     });
 
-    new CnameRecord(this, 'AburkeTechCnameRecord', {
+    new HttpsRedirect(this, `${this.aburkeTech}Redirect`, {
+      recordNames: [this.domainName],
+      targetDomain: `${this.www}.${this.domainName}`,
+      zone: zone,
+    });
+
+    new CnameRecord(this, `${this.aburkeTech}CnameRecord`, {
       recordName: this.www,
       domainName: 'cname.vercel-dns.com',
       zone: zone,
     });
 
-    const apiSecret: ISecret = Secret.fromSecretNameV2(this, 'GitHubRepoApiIdSecret', 'GitHubRepoApiId');
+    const apiSecret: ISecret = Secret.fromSecretNameV2(
+      this,
+      `${this.gitHubRepo}ApiIdSecret`,
+      `${this.gitHubRepo}ApiId`
+    );
 
     const api = LambdaRestApi.fromRestApiId(
       this,
-      'GitHubRepoReadApi',
+      `${this.gitHubRepo}Api`,
       apiSecret?.secretValue?.unsafeUnwrap()?.toString()
     ) as LambdaRestApi;
 
-    api.addDomainName('GitHubRepoApiDomain', {
+    api.addDomainName(`${this.gitHubRepo}ApiDomain`, {
       domainName: `${this.proj}.${this.domainName}`,
       certificate: certificate,
     });
 
-    new ARecord(this, 'AburkeTechAliasARecrod', {
+    new ARecord(this, `${this.gitHubRepo}ARecord`, {
       recordName: this.proj,
       target: RecordTarget.fromAlias(new ApiGateway(api)),
-      zone: zone,
-    });
-
-    new HttpsRedirect(this, 'AburkeTechRedirect', {
-      recordNames: [this.domainName],
-      targetDomain: `${this.www}.${this.domainName}`,
       zone: zone,
     });
   }
