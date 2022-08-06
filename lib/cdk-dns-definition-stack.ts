@@ -11,9 +11,10 @@ export class CdkDnsDefinitionStack extends Stack {
   private readonly domainName: string = 'aburke.tech';
   private readonly www: string = 'www';
   private readonly proj: string = 'proj';
-  private readonly res: string = 'res';
+  private readonly cloud: string = 'cloud';
   private readonly aburkeTech: string = 'AburkeTech';
   private readonly gitHubRepo: string = 'GitHubRepo';
+  private readonly cloudResume: string = 'CloudResume';
 
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
@@ -39,26 +40,51 @@ export class CdkDnsDefinitionStack extends Stack {
       zone: zone,
     });
 
+    // github repo api in the cdk timer app stack
     const apiSecret: ISecret = Secret.fromSecretNameV2(
       this,
       `${this.gitHubRepo}ApiIdSecret`,
       `${this.gitHubRepo}ApiId`
     );
 
-    const api = LambdaRestApi.fromRestApiId(
+    const gitHubRepoApi = LambdaRestApi.fromRestApiId(
       this,
       `${this.gitHubRepo}Api`,
       apiSecret?.secretValue?.unsafeUnwrap()?.toString()
     ) as LambdaRestApi;
 
-    api.addDomainName(`${this.gitHubRepo}ApiDomain`, {
+    gitHubRepoApi.addDomainName(`${this.gitHubRepo}ApiDomain`, {
       domainName: `${this.proj}.${this.domainName}`,
       certificate: certificate,
     });
 
     new ARecord(this, `${this.gitHubRepo}ARecord`, {
       recordName: this.proj,
-      target: RecordTarget.fromAlias(new ApiGateway(api)),
+      target: RecordTarget.fromAlias(new ApiGateway(gitHubRepoApi)),
+      zone: zone,
+    });
+
+    // cloud res api in the cloud resume aws stack
+    const cloudResumeApiSecret: ISecret = Secret.fromSecretNameV2(
+      this,
+      `${this.cloudResume}ApiIdSecret`,
+      `${this.cloudResume}ApiId`
+    );
+
+    const cloudResumeApi = LambdaRestApi.fromRestApiId(
+      this,
+      `${this.cloudResume}Api`,
+      cloudResumeApiSecret?.secretValue?.unsafeUnwrap()?.toString()
+    ) as LambdaRestApi;
+
+    cloudResumeApi.addDomainName(`${this.cloudResume}ApiDomain`, {
+      domainName: `${this.cloud}.${this.domainName}`,
+      certificate: certificate,
+    });
+
+    new ARecord(this, `${this.cloudResume}ARecord`, {
+      recordName: this.cloud,
+      target: RecordTarget.fromAlias(new ApiGateway(cloudResumeApi)),
       zone: zone,
     });
   }
