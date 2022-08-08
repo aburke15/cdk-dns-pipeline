@@ -1,4 +1,4 @@
-import { SecretValue, Stack, StackProps } from 'aws-cdk-lib';
+import { RemovalPolicy, SecretValue, Stack, StackProps } from 'aws-cdk-lib';
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { ARecord, CnameRecord, PublicHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
@@ -28,15 +28,19 @@ export class CdkDnsDefinitionStack extends Stack {
       zoneName: this.domainName,
     });
 
-    new HttpsRedirect(this, `${this.aburkeTech}Redirect`, {
-      recordNames: [this.domainName],
-      targetDomain: `${this.www}.${this.domainName}`,
+    zone.applyRemovalPolicy(RemovalPolicy.DESTROY);
+
+    const cName = new CnameRecord(this, `${this.aburkeTech}CnameRecord`, {
+      recordName: this.www,
+      domainName: 'cname.vercel-dns.com',
       zone: zone,
     });
 
-    new CnameRecord(this, `${this.aburkeTech}CnameRecord`, {
-      recordName: this.www,
-      domainName: 'cname.vercel-dns.com',
+    cName.applyRemovalPolicy(RemovalPolicy.DESTROY);
+
+    new HttpsRedirect(this, `${this.aburkeTech}Redirect`, {
+      recordNames: [this.domainName],
+      targetDomain: `${this.www}.${this.domainName}`,
       zone: zone,
     });
 
