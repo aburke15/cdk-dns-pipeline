@@ -1,4 +1,4 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { SecretValue, Stack, StackProps } from 'aws-cdk-lib';
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { ARecord, CnameRecord, PublicHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
@@ -40,52 +40,62 @@ export class CdkDnsDefinitionStack extends Stack {
       zone: zone,
     });
 
+    new Secret(this, `${this.aburkeTech}CertificateArnSecret`, {
+      secretName: `${this.aburkeTech}CertificateArn`,
+      secretStringValue: new SecretValue(certificate.certificateArn),
+    });
+
+    new Secret(this, `${this.aburkeTech}HostedZoneIdSecret`, {
+      secretName: `${this.aburkeTech}HostedZoneId`,
+      secretStringValue: new SecretValue(zone.hostedZoneId),
+    });
+
     // github repo api in the cdk timer app stack
-    const apiSecret: ISecret = Secret.fromSecretNameV2(
-      this,
-      `${this.gitHubRepo}ApiIdSecret`,
-      `${this.gitHubRepo}ApiId`
-    );
+    // const apiSecret: ISecret = Secret.fromSecretNameV2(
+    //   this,
+    //   `${this.gitHubRepo}ApiIdSecret`,
+    //   `${this.gitHubRepo}ApiId`
+    // );
 
-    const gitHubRepoApi = LambdaRestApi.fromRestApiId(
-      this,
-      `${this.gitHubRepo}Api`,
-      apiSecret?.secretValue?.unsafeUnwrap()?.toString()
-    ) as LambdaRestApi;
+    // const gitHubRepoApi = LambdaRestApi.fromRestApiId(
+    //   this,
+    //   `${this.gitHubRepo}Api`,
+    //   apiSecret?.secretValue?.unsafeUnwrap()?.toString()
+    // ) as LambdaRestApi;
 
-    gitHubRepoApi.addDomainName(`${this.gitHubRepo}ApiDomain`, {
-      domainName: `${this.proj}.${this.domainName}`,
-      certificate: certificate,
-    });
+    // gitHubRepoApi.addDomainName(`${this.gitHubRepo}ApiDomain`, {
+    //   domainName: `${this.proj}.${this.domainName}`,
+    //   certificate: certificate,
+    // });
 
-    new ARecord(this, `${this.gitHubRepo}ARecord`, {
-      recordName: this.proj,
-      target: RecordTarget.fromAlias(new ApiGateway(gitHubRepoApi)),
-      zone: zone,
-    });
+    // new ARecord(this, `${this.gitHubRepo}ARecord`, {
+    //   recordName: this.proj,
+    //   target: RecordTarget.fromAlias(new ApiGateway(gitHubRepoApi)),
+    //   zone: zone,
+    // });
 
-    // cloud res api in the cloud resume aws stack
-    const cloudResumeApiSecret: ISecret = Secret.fromSecretNameV2(
-      this,
-      `${this.cloudResume}ApiIdSecret`,
-      `${this.cloudResume}ApiId`
-    );
+    // cloud resume api in the cloud resume aws stack
+    // const cloudResumeApiSecret: ISecret = Secret.fromSecretNameV2(
+    //   this,
+    //   `${this.cloudResume}ApiIdSecret`,
+    //   `${this.cloudResume}ApiId`
+    // );
 
-    const cloudResumeApi = LambdaRestApi.fromRestApiId(
-      this,
-      `${this.cloudResume}Api`,
-      cloudResumeApiSecret?.secretValue?.unsafeUnwrap()?.toString()
-    ) as LambdaRestApi;
+    // const cloudResumeApi = LambdaRestApi.fromRestApiId(
+    //   this,
+    //   `${this.cloudResume}Api`,
+    //   cloudResumeApiSecret?.secretValue?.unsafeUnwrap()?.toString()
+    // ) as LambdaRestApi;
 
-    cloudResumeApi.addDomainName(`${this.cloudResume}ApiDomain`, {
-      domainName: `${this.cloud}.${this.domainName}`,
-      certificate: certificate,
-    });
+    // cloudResumeApi.addDomainName(`${this.cloudResume}ApiDomain`, {
+    //   domainName: `${this.cloud}.${this.domainName}`,
+    //   certificate: certificate,
+    // });
 
-    new ARecord(this, `${this.cloudResume}ARecord`, {
-      recordName: this.cloud,
-      target: RecordTarget.fromAlias(new ApiGateway(cloudResumeApi)),
-      zone: zone,
-    });
+    // new ARecord(this, `${this.cloudResume}ARecord`, {
+    //   recordName: this.cloud,
+    //   target: RecordTarget.fromAlias(new ApiGateway(cloudResumeApi)),
+    //   zone: zone,
+    // });
   }
 }
