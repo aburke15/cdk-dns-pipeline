@@ -28,7 +28,7 @@ export class CdkDnsDefinitionStack extends Stack {
       zoneName: this.domainName,
     });
 
-    zone.applyRemovalPolicy(RemovalPolicy.DESTROY);
+    // zone.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
     const cName = new CnameRecord(this, `${this.aburkeTech}CnameRecord`, {
       recordName: this.www,
