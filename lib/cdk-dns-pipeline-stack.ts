@@ -8,7 +8,7 @@ export class CdkDnsPipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const dnsPipeline: CodePipeline = new CodePipeline(this, this.cdkDnsPipeline, {
+    const pipeline: CodePipeline = new CodePipeline(this, this.cdkDnsPipeline, {
       pipelineName: this.cdkDnsPipeline,
       synth: new ShellStep('Synth', {
         input: CodePipelineSource.gitHub('aburke15/cdk-dns-pipeline', 'main'),
@@ -16,6 +16,6 @@ export class CdkDnsPipelineStack extends Stack {
       }),
     });
 
-    dnsPipeline.addStage(new CdkDnsPipelineStage(this, 'CdkDnsPipelineStage'));
+    pipeline.addStage(new CdkDnsPipelineStage(this, `${this.cdkDnsPipeline}Stage`));
   }
 }
